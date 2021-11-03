@@ -1,0 +1,26 @@
+{
+  "name": "movie-api",
+  "version": "1.0.0",
+  "description": "",
+  "main": "src/index.js",
+  "scripts": {
+    "start": "node src/index",
+    "dev": "npx nodemon --delay 1000ms --ext js,graphql -L src/index"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "dependencies": {
+    "apollo-server": "^2.3.1",
+    "bcryptjs": "2.4.3",
+    "graphql-import": "^0.7.1",
+    "graphql-yoga": "1.17.4",
+    "jsonwebtoken": "8.5.0",
+    "moment": "2.24.0",
+    "prisma-binding": "2.3.16",
+    "prisma-client-lib": "1.28.3"
+  },
+  "devDependencies": {
+    "nodemon": "1.18.10"
+  }
+}

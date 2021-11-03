@@ -1,1 +1,3 @@
-gerated/
+src/generated/
+node_modules/
+.env*
