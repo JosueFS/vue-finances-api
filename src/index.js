@@ -5,6 +5,10 @@ const { prisma } = require('./generated/prisma-client');
 
 const resolvers = require('./resolvers');
 
+const { PRISMA_ENDPOINT, PRISMA_SERVICE, PRISMA_STAGE } = process.env;
+
+const endpoint = `${PRISMA_ENDPOINT}/${PRISMA_SERVICE}/${PRISMA_STAGE}`;
+
 const importedTypeDefs = importSchema(__dirname + '/schema.graphql');
 const typeDefs = gql`
   ${importedTypeDefs}
@@ -17,7 +21,7 @@ const server = new ApolloServer({
     ...request,
     db: new Binding.Prisma({
       typeDefs: `${__dirname}/generated/graphql-schema/prisma.graphql`,
-      endpoint: process.env.PRISMA_ENDPOINT,
+      endpoint,
     }),
     prisma,
   }),

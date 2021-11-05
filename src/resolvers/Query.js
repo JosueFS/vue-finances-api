@@ -72,10 +72,6 @@ function records(_, { month, type, accountsIds, categoriesIds }, ctx, info) {
     const endDate = date.endOf('month').toISOString();
 
     AND = [...AND, { date_gte: startDate }, { date_lte: endDate }];
-
-    console.log('Base Date: ', date.toISOString());
-    console.log('Start Date: ', startDate);
-    console.log('End Date: ', endDate);
   }
 
   return ctx.db.query.records(
@@ -85,6 +81,41 @@ function records(_, { month, type, accountsIds, categoriesIds }, ctx, info) {
     },
     info
   );
+}
+
+function totalBalance(_, { date }, ctx, info) {
+  const userId = getUserId(ctx);
+  const dateISO = moment(date, 'DD-MM-YYYY')
+    .endOf('day')
+    .toISOString();
+  const pgSchema = `${process.env.PRISMA_SERVICE}$${process.env.PRISMA_STAGE}`;
+
+  const mutation = `
+    mutation TotalBalance($database: PrismaDatabase, $query: String!) {
+      executeRaw(database: $database, query: $query)
+    }
+  `;
+
+  const variables = {
+    database: 'default',
+    query: `
+      SELECT SUM("${pgSchema}"."Record"."amount") AS totalbalance
+        FROM "${pgSchema}"."Record"
+
+        INNER JOIN "${pgSchema}"."_RecordToUser"
+        ON "${pgSchema}"."_RecordToUser"."A" = "${pgSchema}"."Record"."id"
+
+        WHERE "${pgSchema}"."_RecordToUser"."B" = '${userId}'
+
+        AND "${pgSchema}"."Record"."date" <= '${dateISO}'
+    `,
+  };
+
+  return ctx.prisma.$graphql(mutation, variables).then((response) => {
+    const { totalbalance: totalBalance } = response.executeRaw[0];
+
+    return totalBalance ? totalBalance : 0;
+  });
 }
 
 function user(_, args, ctx, info) {
@@ -97,5 +128,6 @@ module.exports = {
   accounts,
   categories,
   records,
+  totalBalance,
   user,
 };
